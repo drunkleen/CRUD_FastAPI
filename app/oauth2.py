@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from . import schemas, database, basemodel
+from . import schemas, database, models
 from .config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -44,6 +44,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), datab: Session = Depen
         headers={"WWW-Authenticate": "Bearer"})
 
     token = verify_access_token(token, credentials_exception)
-    user = datab.query(basemodel.User).filter(basemodel.User.id == token.id).first()
+    user = datab.query(models.User).filter(models.User.id == token.id).first()
 
     return user

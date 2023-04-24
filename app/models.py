@@ -27,8 +27,8 @@ class User(Base):
     created_time = Column(DateTime(timezone=True), nullable=False, default=func.now())
 
 
-class Check(Base):
-    __tablename__ = 'check'
+class Favorite(Base):
+    __tablename__ = 'favorites'
 
-    post_id = Column(Integer, ForeignKey("posts.id",ondelete="CASCADE"), primary_key=True, nullable=False)
+    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, nullable=False)
