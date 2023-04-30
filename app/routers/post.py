@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from typing import List, Optional
-from .. import schemas, models, oauth2
-from ..database import Session, get_db
+from app import models, oauth2
+from app.database import Session, get_db
+from app.schema import posts
 
 router = APIRouter(
     prefix="/posts",
@@ -9,20 +10,19 @@ router = APIRouter(
 )
 
 
-@router.get('/', status_code=status.HTTP_200_OK, response_model=List[schemas.GetPost])
+@router.get('/', status_code=status.HTTP_200_OK, response_model=List[posts.GetPost])
 async def get_all_posts(datab: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),
-                  limit: int = 10, skip: int = 0, search: Optional[str] = ""):
-
-    posts = datab.query(models.Post)\
-        .filter(models.Post.title.contains(search))\
+                        limit: int = 10, skip: int = 0, search: Optional[str] = ""):
+    post = datab.query(models.Post) \
+        .filter(models.Post.title.contains(search)) \
         .limit(limit).offset(skip).all()
 
-    return posts
+    return post
 
 
-@router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.GetPost)
-async def create_post(n_post: schemas.PostCreate, datab: Session = Depends(get_db),
-                current_user: int = Depends(oauth2.get_current_user)):
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=posts.GetPost)
+async def create_post(n_post: posts.PostCreate, datab: Session = Depends(get_db),
+                      current_user: int = Depends(oauth2.get_current_user)):
     new_post = models.Post(owner_id=current_user.id, **n_post.dict())
     datab.add(new_post)  # add the new post
     datab.commit()  # push the new changes into database
@@ -31,9 +31,9 @@ async def create_post(n_post: schemas.PostCreate, datab: Session = Depends(get_d
     return new_post
 
 
-@router.get('/{post_id}', response_model=schemas.GetPost)
+@router.get('/{post_id}', response_model=posts.GetPost)
 async def get_post(post_id: int, datab: Session = Depends(get_db),
-             current_user: int = Depends(oauth2.get_current_user)):
+                   current_user: int = Depends(oauth2.get_current_user)):
     post = datab.query(models.Post).filter(models.Post.id == post_id).first()
     if not post:
         raise HTTPException(status.HTTP_404_NOT_FOUND,
@@ -44,7 +44,7 @@ async def get_post(post_id: int, datab: Session = Depends(get_db),
 
 @router.delete('/{post_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_post(post_id: int, datab: Session = Depends(get_db),
-                current_user: id = Depends(oauth2.get_current_user)):
+                      current_user: id = Depends(oauth2.get_current_user)):
     post_query = datab.query(models.Post).filter(models.Post.id == post_id)
     deleted_post = post_query.first()
 
@@ -62,8 +62,8 @@ async def delete_post(post_id: int, datab: Session = Depends(get_db),
 
 
 @router.put('/{post_id}')
-async def update_post(post_id: int, post: schemas.PostCreate, datab: Session = Depends(get_db),
-                current_user: id = Depends(oauth2.get_current_user)):
+async def update_post(post_id: int, post: posts.PostCreate, datab: Session = Depends(get_db),
+                      current_user: id = Depends(oauth2.get_current_user)):
     post_query = datab.query(models.Post).filter(models.Post.id == post_id)
     updated_post = post_query.first()
 

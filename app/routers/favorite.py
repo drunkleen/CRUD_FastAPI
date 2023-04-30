@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from ..database import Session, get_db
-from .. import schemas, models, oauth2
+from app.database import Session, get_db
+from app import models, oauth2
+from app.schema import favorite
 
 router = APIRouter(
     prefix="/favorites",
@@ -9,7 +10,7 @@ router = APIRouter(
 
 
 @router.post("/", status_code=status.HTTP_202_ACCEPTED)
-async def favorite(favorite_status: schemas.FavoriteBase,
+async def favorite(favorite_status: favorite.FavoriteBase,
                    db: Session = Depends(get_db),
                    current_user: int = Depends(oauth2.get_current_user)):
     query = db.query(models.Favorite).filter(
@@ -18,7 +19,6 @@ async def favorite(favorite_status: schemas.FavoriteBase,
 
     found = query.first()
 
-    print(f"Favorite\n\n\n\n\n\n\n\n {found} Favorite\n\n\n\n\n\n\n\n")
     if favorite_status.dir:
         if found:
             raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,

@@ -1,9 +1,8 @@
-from pydantic import BaseModel, EmailStr, conint
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
 
 
-# //////////////////////////////// User Side ////////////////////////////////
 class UserBase(BaseModel):
     mail: EmailStr
 
@@ -24,40 +23,6 @@ class UserCreate(UserBase):
 
     class Config:
         orm_mode = True
-
-
-# //////////////////////////////// Posts ////////////////////////////////
-class PostBase(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-
-
-class GetPost(PostBase):
-    id: int
-    created_time: datetime
-    owner_id: int
-    owner: UserBase
-
-    class Config:
-        orm_mode = True
-
-
-class PostCreate(PostBase):
-    pass
-
-    class Config:
-        orm_mode = True
-
-
-class PostUpdate(PostBase):
-    pass
-
-
-# ////////////////////////////// Favorite ///////////////////////////////
-class FavoriteBase(BaseModel):
-    post_id: int
-    dir: bool
 
 
 # //////////////////////////////// AUTH ////////////////////////////////

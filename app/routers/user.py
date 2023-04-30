@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from typing import List
-from .. import schemas, models
-from ..database import Session, get_db
-from ..utility import hash_password
+from app import models
+from app.database import Session, get_db
+from app.utility import hash_password
+from app.schema import users
 
 router = APIRouter(
     prefix="/users",
@@ -10,15 +11,15 @@ router = APIRouter(
 )
 
 
-@router.get('/', status_code=status.HTTP_200_OK, response_model=List[schemas.GetUser])
-async def get_all_users(datab: Session = Depends(get_db)):
-    users = datab.query(models.User).all()
+@router.get('/', status_code=status.HTTP_200_OK, response_model=List[users.GetUser])
+async def get_all_users(db: Session = Depends(get_db)):
+    user = db.query(models.User).all()
 
-    return users
+    return user
 
 
-@router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.GetUser)
-async def create_user(n_user: schemas.UserCreate, datab: Session = Depends(get_db)):
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=users.GetUser)
+async def create_user(n_user: users.UserCreate, datab: Session = Depends(get_db)):
     # hashing password:
     n_user.password = hash_password(n_user.password)
     # create the user
@@ -30,7 +31,7 @@ async def create_user(n_user: schemas.UserCreate, datab: Session = Depends(get_d
     return new_user
 
 
-@router.get('/{user_id}', status_code=status.HTTP_200_OK, response_model=schemas.GetUser)
+@router.get('/{user_id}', status_code=status.HTTP_200_OK, response_model=users.GetUser)
 async def get_user(user_id: int, datab: Session = Depends(get_db)):
     user = datab.query(models.User).filter(models.User.id == user_id).first()
     if not user:

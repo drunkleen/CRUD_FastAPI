@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from ..database import Session, get_db
-from .. import schemas, models, utility, oauth2
-
+from app.database import Session, get_db
+from app import models, utility, oauth2
+from app.schema import users
 router = APIRouter(tags=["Authentication"])
 
 
-@router.post("/login", response_model=schemas.Token)
+@router.post("/login", response_model=users.Token)
 async def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(models.User).filter(
         models.User.mail == user_credentials.username).first()
