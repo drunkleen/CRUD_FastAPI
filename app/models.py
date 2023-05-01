@@ -32,3 +32,14 @@ class Favorite(Base):
 
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, nullable=False)
+
+
+class IPLog(Base):
+    __tablename__ = 'iplog'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    user_mail = Column(String, index=True, nullable=False)
+    user_browser = Column(String, index=True, nullable=False)
+    user_os = Column(String, index=True, nullable=False)
+    user_device = Column(String, index=True, nullable=False)
+    created_time = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))

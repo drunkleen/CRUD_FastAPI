@@ -25,7 +25,7 @@ class UserCreate(UserBase):
         orm_mode = True
 
 
-# //////////////////////////////// AUTH ////////////////////////////////
+# AUTH //
 class UserLogin(BaseModel):
     mail: EmailStr
     password: str
@@ -46,6 +46,18 @@ class TokenData(BaseModel):
     id: Optional[str] = None
 
     # token_type: str
+
+    class Config:
+        orm_mode = True
+
+
+# IP Logging //
+class IP(BaseModel):
+    user_mail: EmailStr
+    user_browser: str
+    user_os: str
+    user_device: str
+    created_time: datetime
 
     class Config:
         orm_mode = True
